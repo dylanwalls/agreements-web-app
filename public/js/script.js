@@ -126,14 +126,32 @@ async function loadPartnerships() {
         });
         generateButtonCell.appendChild(generateLoanButton);
 
-        // Generate Repayment Schedule Button
-        const generateRepaymentScheduleButton = document.createElement('button');
-        generateRepaymentScheduleButton.textContent = 'Generate Repayment Schedule';
-        generateRepaymentScheduleButton.addEventListener('click', (event) => {
+        // Create an Upload Document button
+        const uploadDocumentButton = document.createElement('button');
+        uploadDocumentButton.textContent = 'Upload Document';
+        uploadDocumentButton.style.marginLeft = '10px'; // Add some spacing if needed
+        uploadDocumentButton.addEventListener('click', (event) => {
             event.stopPropagation(); // Prevent the row click event
-            generateRepaymentSchedule(partnership.ID);
+            document.getElementById(`fileInput-${partnership.ID}`).click(); // Trigger the hidden file input click
         });
-        generateButtonCell.appendChild(generateRepaymentScheduleButton);
+
+        // Append the Upload Document button to the cell
+        generateButtonCell.appendChild(uploadDocumentButton);
+
+        // Create a hidden file input for document upload
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.id = `fileInput-${partnership.ID}`;
+        fileInput.style.display = 'none'; // Hide the file input
+        fileInput.addEventListener('change', function(event) {
+            // Handle the file(s) selected by the user
+            handleFileUpload(event, partnership.ID);
+        });
+
+        // Append the hidden file input to the cell
+        generateButtonCell.appendChild(fileInput);
+
+
 
         const docsDiv = document.createElement('div');
         docsDiv.id = `docs-${partnership.ID}`;
@@ -633,9 +651,9 @@ async function generateRepaymentSchedule(partnershipId) {
 
 function enableEditing(partnershipId, row, editButton) {
     // Convert cells to editable inputs
-    const cells = row.querySelectorAll('td:not(:last-child)'); // Exclude the last cell containing the buttons
+    const cells = Array.from(row.cells).slice(0, -3);
     cells.forEach((cell, index) => {
-        if (index < cells.length - 2) { // Exclude the cell with the Edit/Save button and the Generate Partnership Agreement button
+        if (index < cells.length - 3) { // Exclude the cell with the Edit/Save button and the Generate Partnership Agreement button
             const input = document.createElement('input');
             input.type = 'text';
             input.value = cell.textContent;
@@ -649,7 +667,7 @@ function enableEditing(partnershipId, row, editButton) {
     editButton.setAttribute('data-editing', 'true');
 
     // Hide the Generate Partnership Agreement button
-    const generateButtonCell = row.cells[row.cells.length - 1];
+    const generateButtonCell = row.cells[row.cells.length - 2];
     const generateButton = generateButtonCell.querySelector('button');
     if (generateButton) {
         generateButton.style.display = 'none';
@@ -660,7 +678,7 @@ async function saveChanges(partnershipId, row, editButton) {
     event.stopPropagation(); // Prevent the default action
 
     const updatedPartnershipData = {};
-    const cells = row.querySelectorAll('td:not(:last-child)'); // Exclude the cells with buttons
+    const cells = Array.from(row.querySelectorAll('td')).slice(0, -3); // Exclude the cells with buttons
 
     // Define a mapping for special field names
     const fieldMappings = {
@@ -763,5 +781,58 @@ async function combinePdfs(pdfUrls, outputFileName, partnershipId) {
     } catch (error) {
         console.error('Error combining PDFs:', error);
         throw error;
+    }
+}
+
+// This function is triggered by the file input's onchange event
+async function handleFileUpload(event, partnershipId) {
+    console.log('handleFileUpload');
+    const file = event.target.files[0];
+    if (!file) {
+        console.log('No file selected.');
+        return;
+    }
+
+    // Convert file to base64
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+        console.log('FileReader onload event triggered.');
+        // Extract the base64 content from the reader result
+        const fileContent = reader.result.split(',')[1]; // Remove the prefix `data:application/pdf;base64,`
+        const fileName = file.name;
+        console.log('FileName in FileReader:', fileName);
+
+        // Now, call your function to upload the document
+        await uploadDocument(partnershipId, fileContent, fileName);
+    };
+    reader.onerror = function (error) {
+        console.log('Error in FileReader: ', error);
+    };
+}
+
+async function uploadDocument(partnershipId, fileContent, fileName) {
+    // Prepare the request body
+    const body = {
+        fileName,
+        fileContent,
+        PartnershipID: partnershipId
+    };
+    console.log('Body:', body)
+    // Call your Azure Function to upload the document
+    try {
+        const response = await fetch('https://dashboard-function-app-1.azurewebsites.net/api/agreementsUploadPartnershipDocument?code=8kvY3jkmkaI7-pGv0Fmj6wMSL3WxoI0uI_xxaE2k6du6AzFuJpCvSw==', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to upload document.');
+        }
+        const responseData = await response.json();
+        console.log('Document uploaded successfully. URL:', responseData.url);
+    } catch (error) {
+        console.error('Error uploading document:', error);
     }
 }
