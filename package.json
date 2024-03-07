@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "partnership.js",
+  "scripts": {
+    "start": "node partnership.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
