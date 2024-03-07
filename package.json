@@ -2,9 +2,9 @@
   "name": "applications_web_app",
   "version": "1.0.0",
   "description": "",
-  "main": "partnership.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node partnership.js"
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",

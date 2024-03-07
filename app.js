@@ -7,5 +7,5 @@ const port = process.env.PORT || 3030;
 app.use(express.static('public'));
 
 app.listen(port, () => {
-  console.log(`Server listening aton port ${port}`);
+  console.log(`Server listening on port ${port}`);
 });
