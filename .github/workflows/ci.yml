@@ -1,21 +1,31 @@
-name: Node.js CI
+name: Azure Static Web Apps CI/CD
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main # Change this to your main branch name
 
 jobs:
-  build:
+  build_and_deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-    - name: Use Node.js
+    - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '14'
+        node-version: '14' # Use the version of Node.js you need
 
     - name: Install dependencies
-      run: npm install
+      run: npm install # Install any dependencies if necessary
 
-    - name: Run a script
-      run: npm run build # or any other command you want to run
+    - name: Build and deploy to Azure Static Web Apps
+      uses: Azure/static-web-apps-deploy@v1
+      with:
+        azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        action: "upload"
+        app_location: "/" # Root directory of your repository
+        output_location: "/public" # Leave this empty to deploy your entire repository
