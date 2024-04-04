@@ -701,13 +701,24 @@ async function saveChanges(partnershipId, row, editButton) {
             switch (key) {
                 case 'noUnits':
                 case 'noMonths':
-                    value = parseInt(value, 10); // Convert to integer
+                    value = parseInt(value, 10);
                     break;
                 case 'totalInvestment':
-                    value = parseFloat(value); // Convert to float
+                    value = parseFloat(value);
                     break;
                 case 'dateAgreementSigned':
-                    value = new Date(value).toISOString().split('T')[0]; // Format date to YYYY-MM-DD
+                case 'dateAgreementStarts': // Assuming you might have another date field like this
+                    if (value) { // Only proceed if value is not empty
+                        const date = new Date(value);
+                        if (!isNaN(date.getTime())) { // Check if date is valid
+                            value = date.toISOString().split('T')[0];
+                        } else {
+                            // If date is invalid or empty, skip this field
+                            return; // Skip this iteration, effectively not adding this field to the data
+                        }
+                    } else {
+                        return; // Skip this iteration if date is empty
+                    }
                     break;
                 default:
                     // Use the value as-is for other fields
