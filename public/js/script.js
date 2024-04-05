@@ -292,7 +292,7 @@ async function generatePartnershipAgreement(partnershipId) {
     const idNumber = partners.map(partner => partner.idNumber).join(' / ');
     const emails = partners.map(partner => partner.email).join(' / ');
     const primaryContactNumber = partners.map(partner => partner.contactNumber).join(' AND ');
-    const propertyDescription = `${partnershipData.ERFNumber} ${partnershipData.Address} ${partnershipData.TitleDeedNumber}`;
+    const propertyDescription = `ERF ${partnershipData.ERFNumber}, ${partnershipData.Address}, Title Deed Number ${partnershipData.TitleDeedNumber}`;
     const totalInWords = numberToWords(partnershipData.TotalInvestment) + ' rand';
     console.log('totalinwords', totalInWords);
 
