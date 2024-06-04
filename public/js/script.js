@@ -652,9 +652,9 @@ async function generateRepaymentSchedule(partnershipId) {
 
 function enableEditing(partnershipId, row, editButton) {
     // Convert cells to editable inputs
-    const cells = Array.from(row.cells).slice(0, -3);
+    const cells = Array.from(row.cells).slice(0, -4);
     cells.forEach((cell, index) => {
-        if (index < cells.length - 3) { // Exclude the cell with the Edit/Save button and the Generate Partnership Agreement button
+        if (index < cells.length) { // Exclude the cell with the Edit/Save button and the Generate Partnership Agreement button
             const input = document.createElement('input');
             input.type = 'text';
             input.value = cell.textContent;
