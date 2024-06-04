@@ -280,6 +280,7 @@ async function generatePartnershipAgreement(partnershipId) {
     console.log('Partners data:', partners);
 
     const dateAgreementSigned = new Date(partnershipData.DateAgreementSigned);
+    console.log('dateAgreementSigned:', dateAgreementSigned);
     // Format the date to exclude the timestamp, resulting in a YYYY-MM-DD format
     const dateWithoutTime = dateAgreementSigned.toISOString().split('T')[0];    
 
