@@ -315,6 +315,7 @@ async function generatePartnershipAgreement(partnershipId) {
             accountHolder: partnershipData.AccountHolder,
             accountNumber: partnershipData.AccountNumber,
             accountType: partnershipData.AccountType,
+            notesAdditions: partnershipData.NotesAdditions,
             fullNames: fullNames,
             idNumber: idNumber,
             emails: emails,
